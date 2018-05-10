@@ -1,0 +1,38 @@
+myhost = "{{HOSTNAME}}"
+
+# pki setup
+pki $myhost certificate "{{TLS_CERTIFICATE}}"
+pki $myhost key         "{{TLS_PRIVATE_KEY}}"
+
+# tables setup
+table aliases  file:/etc/mail/aliases
+table domains  file:/etc/mail/domains
+table passwd   passwd:/etc/mail/passwd
+table virtuals file:/etc/mail/virtuals
+
+########################################################
+# networking setup
+
+# accept foreign mail
+listen on 0.0.0.0   port 25    hostname $myhost pki $myhost tls
+
+# send mail from authenticated users
+listen on 0.0.0.0   port 587   hostname $myhost pki $myhost tls-require auth <passwd>
+
+# receive DKIM-signed emails
+listen on 127.0.0.1 port 10029 hostname $myhost tag DKIM_SIGNED
+
+########################################################
+# ruleset
+
+# allow local messages (should never happen inside this container)
+accept from local for local alias <aliases> deliver to lmtp "/run/dovecot/lmtp"
+
+# allow virtual domains
+accept from any for domain <domains> virtual <virtuals> deliver to lmtp "/run/dovecot/lmtp"
+
+# allow relaying all DKIM-signed messages (because *we* provided them to DKIMproxy)
+accept tagged DKIM_SIGNED for any relay hostname $myhost
+
+# relay unsigned mails to DKIMproxy
+accept from local for any relay via smtp://127.0.0.1:10028 hostname $myhost

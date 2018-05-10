@@ -1,0 +1,36 @@
+protocols = imap lmtp
+
+# in case of trouble, uncomment these three lines
+#log_path = /var/log/dovecot.log
+#auth_debug = yes
+#mail_debug = yes
+
+# disable plaintext IMAP
+service imap-login {
+  inet_listener imap {
+    port = 0
+  }
+}
+
+# enable local LMTP daemon
+service lmtp {
+  unix_listener lmtp {
+    mode = 0666
+  }
+}
+
+passdb {
+  driver = passwd-file
+  args = scheme=sha512-crypt /etc/mail/passwd
+}
+
+userdb {
+  driver = passwd-file
+  args = username_format=%n /etc/mail/passwd
+  default_fields = home=/var/mail-data/%n mail=maildir:/var/mail-data/%n/mail
+}
+
+ssl = required
+ssl_cert = <{{TLS_CERTIFICATE}}
+ssl_key = <{{TLS_PRIVATE_KEY}}
+ssl_dh_parameters_length = 2048

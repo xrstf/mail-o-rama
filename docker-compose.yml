@@ -1,0 +1,44 @@
+version: "3"
+services:
+  mail-o-rama:
+    build: .
+    hostname: mail-o-rama
+    ports:
+      - "143:143"  # IMAP
+      - "993:993"  # IMAPS
+      - "25:25"    # SMTP
+      - "465:465"  # authenticated TLS-SMTP
+      - "587:587"  # TLS-SMTP
+    environment:
+      # the name of your mailserver, NOT the domains you want to handle on it
+      - "HOSTNAME=bundy.net"
+
+      # It's your job to provide a TLS certificate and private key. You should
+      # probably already have a Let's Encrypt client setup somewhere.
+      - "TLS_CERTIFICATE=/ssl/fullchain"
+      - "TLS_PRIVATE_KEY=/ssl/privkey"
+
+      # Configure what DKIM private key to use and what the DKIM selector should be.
+      - "DKIM_PRIVATE_KEY=/etc/dkimkeys/mail.pem"
+      - "DKIM_SELECTOR=mail"
+
+    volumes:
+      # See the README on these files.
+      - ./mounts/aliases:/etc/mail/aliases:ro
+      - ./mounts/domains:/etc/mail/domains:ro
+      - ./mounts/accounts:/etc/mail/accounts:ro
+      - ./mounts/virtuals:/etc/mail/virtuals:ro
+
+      # add the DKIM private key
+      - ./dkim.priv.pem:/etc/dkimkeys/mail.pem:ro
+
+      # This directory holds all mail data for all accounts. This is your
+      # holy directory and you should keep regular backups from this.
+      - ./mail-data:/var/mail-data
+
+      # mount your TLS certificate and private key;
+      # simply mounting the domain directory does not work because the
+      # privkey is a symlink; mounting the files directly makes Docker
+      # resolve the symlink before mounting
+      - /var/lib/acme/live/bundy.net/fullchain:/ssl/fullchain:ro
+      - /var/lib/acme/live/bundy.net/privkey:/ssl/privkey:ro

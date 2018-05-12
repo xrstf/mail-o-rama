@@ -90,11 +90,11 @@ reaches your inbox. You have basically two options:
 ### SMTP-based using an MTA
 
 You can install a classic MTA like sendmail, postfix or exim on your Docker host
-and configure it to relay mail to the Docker container via authenticated SMTP.
-This has the drawback that you need to map your host usernames to e-mail
-addresses (because you cannot send an e-mail just to "root"), but at the same
-time is the only viable solution when you have other Docker containers that
-also should send e-mail.
+and configure it to relay mail to the Docker container via SMTP. This has the
+drawback that you need to map your host usernames to e-mail addresses (because
+you cannot send an e-mail just to "root"), but at the same time is the only
+viable solution when you have other Docker containers that also should send
+e-mail.
 
 An easy solution is to use `msmtp`. In many cases (like for Archlinux and Debian)
 there's an addtional package, `msmtp-mta`, that provides a `/usr/sbin/sendmail`

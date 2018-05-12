@@ -87,18 +87,57 @@ The goal is to get rid of as much e-mail infrastructure on the host system as
 possible. But this leaves the question as to how mails from your cron daemon
 reaches your inbox. You have basically two options:
 
-* **Option A:** You install an MTA (sendmail, Postfix, eixm) on your host and
-  configure it to relay all mail to your port 25. This should work, but I have
-  not tested it.
-* **Option B:** You use the OpenSMTPD-provided `sendmail` that is already
-  installed inside the container. This only requires you to make sure that you
-  have a `/usr/sbin/sendmail` program on your Docker host that performs a
-  `docker exec -i <container> sendmail ...`.
+### SMTP-based using an MTA
 
-I chose option B and wrote a very simple Go program that can be used as your
-local sendmail program. See the `sendmail/` directory for the source and some
-precompiled binaries. Simply place the binary at `/usr/sbin/sendmail` (or
-symlink it) and make sure to configure the container name
+You can install a classic MTA like sendmail, postfix or exim on your Docker host
+and configure it to relay mail to the Docker container via authenticated SMTP.
+This has the drawback that you need to map your host usernames to e-mail
+addresses (because you cannot send an e-mail just to "root"), but at the same
+time is the only viable solution when you have other Docker containers that
+also should send e-mail.
+
+An easy solution is to use `msmtp`. In many cases (like for Archlinux and Debian)
+there's an addtional package, `msmtp-mta`, that provides a `/usr/sbin/sendmail`
+program. A sample configuration could look like this:
+
+    # Set default values for all following accounts.
+    defaults
+    aliases   /etc/aliases.msmtp
+
+    # Mail-o-Rama
+    account   mailorama
+    host      localhost
+    port      25
+    from      cron@buster
+
+    # Set a default account
+    account default : mailorama
+
+You also want to have an aliases file that maps your user accounts to an e-mail
+address. The regular `/etc/aliases` does not work if it contains mappings for
+non-existing users, so it's probably a good idea to use a dedicated aliases file
+that looks like this:
+
+    root: al@bundy.net
+    al: al@bundy.net
+
+It should be very easy to install an MTA like this into your other Docker
+containers to have them also properly deliver their mail to you.
+
+### Use `docker exec` and sendmail
+
+Instead of sending e-mail via SMTP to the container, you can also use the
+sendmail aliases that's provided by OpenSMTPD. For this, you need something on
+your host that runs `docker exec -i <your container> sendmail ...` for each new
+mail. In this case, usernames are mappened to mail accounts using the
+`/etc/aliases` file *inside the container*.
+
+The `/usr/sbin/sendmail` program cannot be a shellscript, because programs like
+cron run it via `popen()`. To work around this, I wrote a very simple Go program
+that can be used as your local sendmail program. See the `sendmail/` directory
+for the source and some precompiled binaries. Simply place the binary at
+`/usr/sbin/sendmail` (or symlink it) and make sure to configure the container
+name
 
 * either by setting a system-wide environment variable
   `MAILORAMA_CONTAINER=<full docker container name here>`

@@ -108,7 +108,7 @@ program. A sample configuration could look like this:
     account   mailorama
     host      localhost
     port      25
-    from      cron@buster
+    from      cron@bundy.net
 
     # Set a default account
     account default : mailorama

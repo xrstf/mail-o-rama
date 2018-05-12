@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "P1k/rRZQcNOL007S73GRLXUdQIU=",
+			"path": "gopkg.in/ini.v1",
+			"revision": "6529cf7c58879c08d927016dde4477f18a0634cb",
+			"revisionTime": "2018-04-20T14:56:02Z"
+		}
+	],
+	"rootPath": "github.com/xrstf/sendmail"
+}

@@ -22,6 +22,11 @@ services:
       - "DKIM_PRIVATE_KEY=/etc/dkimkeys/mail.pem"
       - "DKIM_SELECTOR=mail"
 
+      # If you chose to use the included backup script, you can configure a
+      # retention period for your backup files. This is the number of days for
+      # which to keep backups.
+      - "BACKUP_RETENTION_DAYS=7"
+
     volumes:
       # See the README on these files.
       - ./mounts/aliases:/etc/mail/aliases:ro

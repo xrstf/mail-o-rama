@@ -143,3 +143,17 @@ name
   `MAILORAMA_CONTAINER=<full docker container name here>`
 * or by creating an INI file in `/etc/mail-o-rama/sendmail.ini` with only one
   setting: `container = <full docker container name here>`
+
+## Backups
+
+As e-mail data is stored in Maildirs, creating a backup can be as simple as
+`tar`ing up each mail account. To make things simpler, there is a tiny
+`backup.sh` script included in the image which is meant to be called once per
+day via
+
+    docker-compose exec mail-o-rama /backup.sh
+
+The script will create tar.gz files (named as ``YYYY-MM-DD.tar.gz``) in each
+mail account directory. If you set the `BACKUP_RETENTION_DAYS` environment
+variable to a non-empty value, the script will also cleanup old backups
+automatically.

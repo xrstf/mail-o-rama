@@ -11,6 +11,7 @@ RUN apt-get update && \
       dovecot-core \
       dovecot-imapd \
       dovecot-lmtpd \
+      dovecot-sieve \
       opensmtpd \
       supervisor
 

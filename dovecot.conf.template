@@ -30,7 +30,21 @@ userdb {
   default_fields = home=/var/mail-data/%n mail=maildir:/var/mail-data/%n/mail
 }
 
+# TLS configuration
 ssl = required
 ssl_cert = <{{TLS_CERTIFICATE}}
 ssl_key = <{{TLS_PRIVATE_KEY}}
 ssl_dh_parameters_length = 2048
+
+# Sieve configuration
+protocol lda {
+  mail_plugins = $mail_plugins sieve
+}
+
+protocol lmtp {
+  mail_plugins = $mail_plugins sieve
+}
+
+plugin {
+  sieve_extensions = +vnd.dovecot.debug
+}

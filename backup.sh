@@ -20,7 +20,7 @@ for user in $(doveadm user '*'); do
 
   # and zip everything up
   cd "$base/$user"
-  tar czf "$today.tar.gz" backup
+  tar czf "$today.tar.gz" backup sieve/*.sieve
   ln -sf "$today.tar.gz" latest-backup.tar.gz
 
   # optionally remove old backup files

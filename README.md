@@ -4,7 +4,7 @@ This is a very simple mail server based on Docker with these features:
 
 * Multiple mail accounts
 * Multiple virtual e-mail addresses per account
-* SMTP via OpenSMTPD
+* SMTP via Postfix
 * IMAP via Dovecot
 * DKIM signatures via dkimproxy
 

@@ -12,6 +12,8 @@ services:
     environment:
       # the name of your mailserver, NOT the domains you want to handle on it
       - "HOSTNAME=bundy.net"
+      - "DOMAIN=bundy.net"
+      - "DESTINATION=bundy.net, myserver, localhost"
 
       # It's your job to provide a TLS certificate and private key. You should
       # probably already have a Let's Encrypt client setup somewhere.

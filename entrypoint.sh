@@ -29,15 +29,16 @@ while read line; do
 done < /etc/mail/accounts
 
 ###################################################################
-# configure opensmtpd
+# configure Postfix
 
-echo "Configuring OpenSMTPD for host $HOSTNAME ..."
+echo "Configuring Postfix for host $HOSTNAME ..."
 
-cat /etc/mail/smtpd.conf.template | sed \
+cat /etc/postfix/main.cf.template | sed \
   -e "s|{{TLS_CERTIFICATE}}|$TLS_CERTIFICATE|g" \
   -e "s|{{TLS_PRIVATE_KEY}}|$TLS_PRIVATE_KEY|g" \
   -e "s|{{HOSTNAME}}|$HOSTNAME|g" \
-  > /etc/mail/smtpd.conf
+  -e "s|{{DOMAIN}}|$DOMAIN|g" \
+  > /etc/postfix/main.cf
 
 ###################################################################
 # configure dovecot

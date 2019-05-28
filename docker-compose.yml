@@ -1,7 +1,7 @@
 version: "3"
 services:
   mail-o-rama:
-    build: xrstf/mail-o-rama:latest
+    build: xrstf/mail-o-rama:postfix
     hostname: mail-o-rama
     ports:
       - "143:143"  # IMAP
@@ -12,8 +12,13 @@ services:
     environment:
       # the name of your mailserver, NOT the domains you want to handle on it
       - "HOSTNAME=bundy.net"
+      # the opposite of HOSTNAME, i.e. your primary e-mail domain
       - "DOMAIN=bundy.net"
       - "DESTINATION=bundy.net, myserver, localhost"
+      - "VIRTUAL_DOMAIN_ALIASES=bundy-family.com, biguns.us"
+      - "MESSAGE_SIZE_LIMIT=100240000" # 100MB
+      - "SMTPD_MILTERS=inet:localhost:11332" # rspamd
+      - "NON_SMTPD_MILTERS="
 
       # It's your job to provide a TLS certificate and private key. You should
       # probably already have a Let's Encrypt client setup somewhere.
@@ -40,7 +45,7 @@ services:
       - ./dkim.priv.pem:/etc/dkimkeys/mail.pem:ro
 
       # This directory holds all mail data for all accounts. This is your
-      # holy directory and you should keep regular backups from this.
+      # holy directory and you should keep regular backups of it.
       - ./mail-data:/var/mail-data
 
       # mount your TLS certificate and private key;

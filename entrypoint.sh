@@ -17,15 +17,15 @@ while read line; do
   home="/var/mail-data/$username"
 
   # first delete a possibly existing user account
-  deluser --quiet "$username" 2> /dev/null || true
+  deluser "$username" 2> /dev/null || true
 
   # (re-)create it
   echo "  -> creating $username"
-  adduser --quiet --disabled-login --disabled-password --gecos "" --home "$home" --uid "$userid" "$username"
+  adduser -D -s /sbin/nologin -g "" -h "$home" -u "$userid" "$username"
   #echo "$username:$password" | chpasswd
 
   # create a classic passwd-file because dovecot cannot handle the system's shadow file
-  echo "$username:$password:$userid:$userid::$home:/bin/nologin" >> /etc/mail/passwd
+  echo "$username:$password:$userid:$userid::$home:/sbin/nologin" >> /etc/mail/passwd
 done < /etc/mail/accounts
 
 ###################################################################
@@ -33,11 +33,30 @@ done < /etc/mail/accounts
 
 echo "Configuring Postfix for host $HOSTNAME ..."
 
+DOMAIN="${DOMAIN:-$HOSTNAME}"
+
+# always include dkimproxy milter
+ALL_SMTPD_MILTERS="inet:localhost:8891"
+ALL_NON_SMTPD_MILTERS="inet:localhost:8891"
+
+if [ -n "$SMTPD_MILTERS" ]; then
+  ALL_SMTPD_MILTERS="$ALL_SMTPD_MILTERS, $SMTPD_MILTERS"
+fi
+
+if [ -n "$NON_SMTPD_MILTERS" ]; then
+  ALL_NON_SMTPD_MILTERS="$ALL_NON_SMTPD_MILTERS, $NON_SMTPD_MILTERS"
+fi
+
 cat /etc/postfix/main.cf.template | sed \
   -e "s|{{TLS_CERTIFICATE}}|$TLS_CERTIFICATE|g" \
   -e "s|{{TLS_PRIVATE_KEY}}|$TLS_PRIVATE_KEY|g" \
   -e "s|{{HOSTNAME}}|$HOSTNAME|g" \
   -e "s|{{DOMAIN}}|$DOMAIN|g" \
+  -e "s|{{DESTINATION}}|$DESTINATION|g" \
+  -e "s|{{VIRTUAL_DOMAIN_ALIASES}}|$VIRTUAL_DOMAIN_ALIASES|g" \
+  -e "s|{{MESSAGE_SIZE_LIMIT}}|$MESSAGE_SIZE_LIMIT|g" \
+  -e "s|{{SMTPD_MILTERS}}|$ALL_SMTPD_MILTERS|g" \
+  -e "s|{{NON_SMTPD_MILTERS}}|$ALL_NON_SMTPD_MILTERS|g" \
   > /etc/postfix/main.cf
 
 ###################################################################

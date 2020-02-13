@@ -46,5 +46,5 @@ protocol lmtp {
 }
 
 plugin {
-  sieve_extensions = +vnd.dovecot.debug
+  sieve_extensions = +vnd.dovecot.debug +variables +editheader
 }

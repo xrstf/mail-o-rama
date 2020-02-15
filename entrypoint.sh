@@ -47,6 +47,7 @@ echo "Configuring Dovecot ..."
 cat /etc/dovecot/local.conf.template | sed \
   -e "s|{{TLS_CERTIFICATE}}|$TLS_CERTIFICATE|g" \
   -e "s|{{TLS_PRIVATE_KEY}}|$TLS_PRIVATE_KEY|g" \
+  -e "s|{{SIEVE_BIN_DIR}}|${SIEVE_BIN_DIR:-/etc/dovecot/sieve}|g" \
   > /etc/dovecot/local.conf
 
 chown dovecot:dovecot /var/mail-data

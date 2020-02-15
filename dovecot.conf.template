@@ -47,4 +47,9 @@ protocol lmtp {
 
 plugin {
   sieve_extensions = +vnd.dovecot.debug +variables +editheader
+  sieve_plugins = sieve_extprograms
+  sieve_global_extensions = +vnd.dovecot.pipe +vnd.dovecot.filter
+  sieve_pipe_bin_dir = {{SIEVE_BIN_DIR}}
+  sieve_filter_bin_dir = {{SIEVE_BIN_DIR}}
+  sieve_execute_bin_dir = {{SIEVE_BIN_DIR}}
 }
